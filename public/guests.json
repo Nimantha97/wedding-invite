@@ -1,10 +1,10 @@
 [
-  { "slug": "priya", "name": "Priya Sharma" },
-  { "slug": "rahul", "name": "Rahul Mehta" },
-  { "slug": "ananya", "name": "Ananya Patel" },
-  { "slug": "vikram", "name": "Vikram Singh" },
-  { "slug": "neha", "name": "Neha Gupta" },
-  { "slug": "arjun", "name": "Arjun Nair" },
-  { "slug": "kavya", "name": "Kavya Reddy" },
-  { "slug": "rohan", "name": "Rohan Joshi" }
+  { "slug": "kavindra-dilani",   "name": "Kavindra & Dilani"   },
+  { "slug": "uncle-prasad",      "name": "Uncle Prasad"        },
+  { "slug": "sachini",           "name": "Sachini"             },
+  { "slug": "roshan-maneesha",   "name": "Roshan & Maneesha"   },
+  { "slug": "aunt-kumari",       "name": "Aunt Kumari"         },
+  { "slug": "dinesh-family",     "name": "Dinesh & Family"     },
+  { "slug": "tharanga",          "name": "Tharanga"            },
+  { "slug": "nimal-sandya",      "name": "Nimal & Sandya"      }
 ]
