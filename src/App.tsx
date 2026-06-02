@@ -18,6 +18,7 @@ import Guestbook          from "./components/Guestbook";
 import Quiz               from "./components/Quiz";
 import SpotifyEmbed       from "./components/SpotifyEmbed";
 import SocialShare        from "./components/SocialShare";
+import PhotoUpload        from "./components/PhotoUpload";
 import LoveLetter         from "./components/LoveLetter";
 import GrandFinale        from "./components/GrandFinale";
 
@@ -106,6 +107,7 @@ export default function App() {
           <section id="guestbook"> <Guestbook />                     </section>
           <section id="quiz">      <Quiz />                          </section>
           <section id="playlist">  <SpotifyEmbed />                  </section>
+          <section id="upload">    <PhotoUpload />                   </section>
           <section id="share">     <SocialShare />                   </section>
           <section id="letter">    <LoveLetter />                    </section>
           <section id="finale">    <GrandFinale />                   </section>
