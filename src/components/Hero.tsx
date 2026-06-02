@@ -75,7 +75,7 @@ export default function Hero({ guestName }: Props) {
       </div>
 
       {/* Main content */}
-      <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "7rem 1.5rem 4rem", maxWidth: "46rem", width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "calc(var(--wd-nav-h) + 4rem) 1.25rem 4rem", maxWidth: "46rem", width: "100%" }}>
 
         <motion.div
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}

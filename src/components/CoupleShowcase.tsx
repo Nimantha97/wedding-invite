@@ -41,7 +41,7 @@ export default function CoupleShowcase() {
           Meet the Couple
         </motion.h2>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "1.5rem" }}>
           {couple.map((person, i) => (
             <motion.div
               key={i}
@@ -56,7 +56,7 @@ export default function CoupleShowcase() {
                 <img src={person.img} alt={person.name} className="couple-card-img" loading="lazy" />
               </div>
 
-              <div style={{ padding: "1.75rem" }}>
+              <div style={{ padding: "1.25rem" }}>
                 <p style={{ fontFamily: "var(--wd-sans)", fontSize: "0.58rem", letterSpacing: "0.38em", textTransform: "uppercase", color: "var(--wd-accent)", marginBottom: "0.4rem" }}>
                   {person.role}
                 </p>

@@ -61,7 +61,7 @@ export default function Guestbook() {
         </motion.h2>
 
         {/* Polaroid wall */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.5rem", marginBottom: "4rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 200px), 1fr))", gap: "1.25rem", marginBottom: "3rem" }}>
           <AnimatePresence>
             {messages.map((m, i) => (
               <motion.div

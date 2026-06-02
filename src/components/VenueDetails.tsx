@@ -27,7 +27,7 @@ export default function VenueDetails() {
           Event Details
         </motion.h2>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: "1rem", marginBottom: "2rem" }}>
           {details.map((d, i) => (
             <motion.div
               key={i}

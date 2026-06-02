@@ -75,7 +75,7 @@ export default function RSVP() {
                 <input required className="wd-input" value={form.name} onChange={set("name")} placeholder="Your full name" />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: "0.75rem" }}>
                 <div>
                   <Label text="Phone Number" />
                   <input className="wd-input" type="tel" value={form.phone} onChange={set("phone")} placeholder="+94 7X XXX XXXX" />
@@ -107,7 +107,7 @@ export default function RSVP() {
                       transition: "all 0.25s",
                     }}>
                       <input type="radio" name="attending" value={v} checked={form.attending === v} onChange={set("attending")} style={{ display: "none" }} />
-                      {v === "yes" ? "🎉 Joyfully Accept" : "😢 Regretfully Decline"}
+                  {v === "yes" ? "🎉 Accept" : "😢 Decline"}
                     </label>
                   ))}
                 </div>

@@ -182,7 +182,7 @@ export default function PhotoUpload() {
               </div>
 
               {/* File cards grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "0.875rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 150px), 1fr))", gap: "0.75rem" }}>
                 {items.map(item => (
                   <motion.div
                     key={item.id}
