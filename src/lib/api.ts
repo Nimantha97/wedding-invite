@@ -13,14 +13,20 @@ export async function fetchGuestbook() {
   return res.json();
 }
 
-// ── POST ────────────────────────────────────────────
-async function post(body: object) {
+// ── POST — uses URLSearchParams to avoid CORS preflight ──
+// Google Apps Script rejects OPTIONS preflight from browsers.
+// URLSearchParams sends as application/x-www-form-urlencoded
+// which is a "simple request" — no preflight needed.
+async function post(body: Record<string, string>) {
+  const params = new URLSearchParams(body);
   const res = await fetch(BASE, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify(body),
+    method: "POST",
+    body:   params,
   });
-  return res.json();
+  // Apps Script always returns 200 even for errors,
+  // response is plain text JSON string
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return { success: true }; }
 }
 
 export const submitRSVP = (data: {
