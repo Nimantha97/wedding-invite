@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { fetchGuests } from "../lib/api";
 import type { Guest } from "../types/guest";
 
 export function useGuest(): string {
@@ -7,13 +8,22 @@ export function useGuest(): string {
   useEffect(() => {
     const slug = new URLSearchParams(window.location.search).get("g");
     if (!slug) return;
-    fetch("/guests.json")
-      .then((r) => r.json())
+
+    fetchGuests()
       .then((guests: Guest[]) => {
         const match = guests.find((g) => g.slug === slug.toLowerCase());
         if (match) setName(match.name);
       })
-      .catch(() => {});
+      .catch(() => {
+        // Fallback to static guests.json
+        fetch("/guests.json")
+          .then((r) => r.json())
+          .then((guests: Guest[]) => {
+            const match = guests.find((g) => g.slug === slug.toLowerCase());
+            if (match) setName(match.name);
+          })
+          .catch(() => {});
+      });
   }, []);
 
   return name;

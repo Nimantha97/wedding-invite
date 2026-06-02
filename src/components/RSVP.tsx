@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { submitRSVP } from "../lib/api";
 
-const WEB3FORMS_KEY = "5bfd2094-32b7-4433-b74c-59ccb684fed5";
 type Status = "idle" | "sending" | "success" | "error";
 
 export default function RSVP() {
@@ -20,17 +20,11 @@ export default function RSVP() {
     e.preventDefault();
     setStatus("sending");
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_KEY,
-          subject: `Wedding RSVP — ${form.name}`,
-          ...form,
-        }),
-      });
-      setStatus(res.ok ? "success" : "error");
-    } catch { setStatus("error"); }
+      const res = await submitRSVP(form);
+      setStatus(res.success ? "success" : "error");
+    } catch {
+      setStatus("error");
+    }
   };
 
   const Label = ({ text }: { text: string }) => (
@@ -76,13 +70,11 @@ export default function RSVP() {
               className="wd-card"
               style={{ padding: "2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}
             >
-              {/* Name */}
               <div>
                 <Label text="Full Name *" />
                 <input required className="wd-input" value={form.name} onChange={set("name")} placeholder="Your full name" />
               </div>
 
-              {/* Phone + Email */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                 <div>
                   <Label text="Phone Number" />
@@ -94,7 +86,6 @@ export default function RSVP() {
                 </div>
               </div>
 
-              {/* Number of guests */}
               <div>
                 <Label text="Number of Guests" />
                 <select className="wd-input" value={form.guests} onChange={set("guests")} style={{ cursor: "pointer" }}>
@@ -102,7 +93,6 @@ export default function RSVP() {
                 </select>
               </div>
 
-              {/* Attendance */}
               <div>
                 <Label text="Attendance *" />
                 <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -123,7 +113,6 @@ export default function RSVP() {
                 </div>
               </div>
 
-              {/* Meal preference (only if attending) */}
               <AnimatePresence>
                 {form.attending === "yes" && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
@@ -137,7 +126,6 @@ export default function RSVP() {
                 )}
               </AnimatePresence>
 
-              {/* Notes */}
               <div>
                 <Label text="Special Notes (optional)" />
                 <textarea

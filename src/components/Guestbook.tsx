@@ -1,36 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { submitGuestbook, fetchGuestbook } from "../lib/api";
 
 interface Message { name: string; relation: string; message: string; rotate: number; }
 
 const SEED_MESSAGES: Message[] = [
-  { name: "Kavindra & Dilani",   relation: "Best Friends",    message: "Wishing you both a lifetime of laughter, love and beautiful memories. So proud of you both! 💛",      rotate: -3 },
-  { name: "Uncle Prasad",        relation: "Family",          message: "May your home always be filled with warmth and your hearts with joy. Congratulations dear children!",  rotate: 2  },
-  { name: "Sachini",             relation: "School Friend",   message: "I've watched this love story unfold — and it's even more magical in person. Love you both! 🌸",         rotate: -1 },
-  { name: "Roshan & Maneesha",   relation: "Colleagues",      message: "The office will never be the same without Nimantha's smile. But we know why he's smiling now! 🥂",     rotate: 3  },
+  { name: "Kavindra & Dilani",  relation: "Best Friends",  message: "Wishing you both a lifetime of laughter, love and beautiful memories. So proud of you both! 💛",     rotate: -3 },
+  { name: "Uncle Prasad",       relation: "Family",        message: "May your home always be filled with warmth and your hearts with joy. Congratulations dear children!", rotate: 2  },
+  { name: "Sachini",            relation: "School Friend", message: "I've watched this love story unfold — and it's even more magical in person. Love you both! 🌸",        rotate: -1 },
+  { name: "Roshan & Maneesha",  relation: "Colleagues",    message: "The office will never be the same without Nimantha's smile. But we know why he's smiling now! 🥂",    rotate: 3  },
 ];
 
 const ROTATIONS = [-4, 2, -2, 4, -3, 1, -1, 3];
 
 export default function Guestbook() {
   const [messages, setMessages] = useState<Message[]>(SEED_MESSAGES);
-  const [form, setForm] = useState({ name: "", relation: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm]         = useState({ name: "", relation: "", message: "" });
+  const [status, setStatus]     = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  // Load approved messages from Sheets on mount
+  useEffect(() => {
+    fetchGuestbook()
+      .then((data: { name: string; relation: string; message: string }[]) => {
+        if (!Array.isArray(data) || data.length === 0) return;
+        const loaded: Message[] = data.map((m, i) => ({
+          ...m,
+          rotate: ROTATIONS[i % ROTATIONS.length],
+        }));
+        setMessages(loaded);
+      })
+      .catch(() => {}); // keep seed messages on error
+  }, []);
 
   const set = (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm(f => ({ ...f, [k]: e.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.message.trim()) return;
-    setMessages(prev => [
-      ...prev,
-      { ...form, rotate: ROTATIONS[prev.length % ROTATIONS.length] },
-    ]);
-    setForm({ name: "", relation: "", message: "" });
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+    setStatus("sending");
+    try {
+      await submitGuestbook(form);
+      setStatus("success");
+      setForm({ name: "", relation: "", message: "" });
+      setTimeout(() => setStatus("idle"), 3500);
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -44,12 +61,7 @@ export default function Guestbook() {
         </motion.h2>
 
         {/* Polaroid wall */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-          gap: "1.5rem",
-          marginBottom: "4rem",
-        }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.5rem", marginBottom: "4rem" }}>
           <AnimatePresence>
             {messages.map((m, i) => (
               <motion.div
@@ -59,25 +71,16 @@ export default function Guestbook() {
                 initial={{ opacity: 0, scale: 0.8, rotate: m.rotate - 10 }}
                 animate={{ opacity: 1, scale: 1, rotate: m.rotate }}
                 transition={{ delay: i * 0.08, type: "spring", stiffness: 120 }}
-                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
               >
-                {/* Polaroid top image area */}
                 <div style={{
                   background: "linear-gradient(135deg, rgba(139,178,170,0.15), rgba(212,180,131,0.1))",
-                  height: "90px",
-                  borderRadius: "1px",
-                  marginBottom: "0.75rem",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "2rem",
+                  height: "90px", borderRadius: "1px", marginBottom: "0.75rem",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem",
                 }}>
                   💌
                 </div>
-                <p style={{
-                  fontFamily: "var(--wd-sans)", fontSize: "0.82rem",
-                  color: "var(--wd-text)", lineHeight: 1.6, marginBottom: "0.75rem",
-                  fontStyle: "italic",
-                }}>
+                <p style={{ fontFamily: "var(--wd-sans)", fontSize: "0.82rem", color: "var(--wd-text)", lineHeight: 1.6, marginBottom: "0.75rem", fontStyle: "italic" }}>
                   "{m.message}"
                 </p>
                 <div style={{ borderTop: "1px solid rgba(46,58,54,0.08)", paddingTop: "0.5rem" }}>
@@ -109,7 +112,7 @@ export default function Guestbook() {
           <div className="gold-divider gold-divider-white" style={{ marginBottom: "1.75rem" }} />
 
           <AnimatePresence mode="wait">
-            {submitted ? (
+            {status === "success" ? (
               <motion.div
                 key="thanks"
                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
@@ -118,6 +121,9 @@ export default function Guestbook() {
                 <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🌸</div>
                 <p style={{ fontFamily: "var(--wd-serif)", fontSize: "1.4rem", fontWeight: 300, color: "var(--wd-text)" }}>
                   Thank you for your wishes!
+                </p>
+                <p style={{ fontFamily: "var(--wd-sans)", fontSize: "0.8rem", color: "var(--wd-text-muted)", marginTop: "0.5rem" }}>
+                  Your message will appear after approval.
                 </p>
               </motion.div>
             ) : (
@@ -148,17 +154,22 @@ export default function Guestbook() {
                     Your Message *
                   </label>
                   <textarea
-                    required
-                    className="wd-input"
-                    value={form.message}
-                    onChange={set("message")}
-                    rows={3}
-                    placeholder="Write your wishes for the couple…"
+                    required className="wd-input"
+                    value={form.message} onChange={set("message")}
+                    rows={3} placeholder="Write your wishes for the couple…"
                     style={{ resize: "none" }}
                   />
                 </div>
-                <button type="submit" className="wd-btn wd-btn-solid">
-                  <span>Post to Wall 💌</span>
+
+                {status === "error" && (
+                  <p style={{ fontFamily: "var(--wd-sans)", fontSize: "0.8rem", color: "#e05959", textAlign: "center" }}>
+                    Something went wrong. Please try again.
+                  </p>
+                )}
+
+                <button type="submit" disabled={status === "sending"} className="wd-btn wd-btn-solid"
+                  style={{ opacity: status === "sending" ? 0.65 : 1, cursor: status === "sending" ? "not-allowed" : "pointer" }}>
+                  <span>{status === "sending" ? "Sending…" : "Post to Wall 💌"}</span>
                 </button>
               </motion.form>
             )}
